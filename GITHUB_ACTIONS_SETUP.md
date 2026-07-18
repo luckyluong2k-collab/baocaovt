@@ -76,11 +76,20 @@ Tao cac bien:
 ```text
 TELEGRAM_CHAT_ID=-1003931579210
 USE_MOCK_DATA=false
-ORDER_SOURCE=csv
+ORDER_SOURCE=api
 TELEGRAM_DRY_RUN=false
 MASK_PHONE=false
 ENABLE_SCHEDULED_CHECK=false
 SEND_DAILY_UNDELIVERED_REPORT=false
+VIETTELPOST_API_BASE_URL=https://partner.viettelpost.vn/v2
+VIETTELPOST_TOKEN_LOGIN_PATH=/user/loginVTP
+VIETTELPOST_LIST_ORDERS_PATH=/order/order-filter?page=1
+VIETTELPOST_LIST_ORDERS_METHOD=POST
+VIETTELPOST_LIST_ORDERS_DAYS_BACK=30
+VIETTELPOST_ORDER_DETAIL_PATH=/core/orders/query?code=:trackingNumber
+VIETTELPOST_ORDER_DETAIL_METHOD=GET
+VIETTELPOST_AUTH_HEADER=Token
+VIETTELPOST_AUTH_SCHEME=raw
 ```
 
 Khi muon bat chay tu dong:
@@ -108,9 +117,16 @@ Neu da co endpoint API that, dat:
 ```text
 ORDER_SOURCE=api
 USE_MOCK_DATA=false
-VIETTELPOST_API_BASE_URL=...
-VIETTELPOST_LIST_ORDERS_PATH=...
-VIETTELPOST_ORDER_DETAIL_PATH=...
+VIETTELPOST_API_BASE_URL=https://partner.viettelpost.vn/v2
+VIETTELPOST_TOKEN_LOGIN_PATH=/user/loginVTP
+VIETTELPOST_LIST_ORDERS_PATH=/order/order-filter?page=1
+VIETTELPOST_LIST_ORDERS_METHOD=POST
+VIETTELPOST_ORDER_DETAIL_PATH=/core/orders/query?code=:trackingNumber
+VIETTELPOST_ORDER_DETAIL_METHOD=GET
+VIETTELPOST_AUTH_HEADER=Token
+VIETTELPOST_AUTH_SCHEME=raw
 ```
 
 Token/mat khau dat trong GitHub Secrets, khong dat trong Variables.
+
+`VIETTELPOST_TOKEN` la ma API lay trong Partner Viettel Post. Bot se tu goi `/user/loginVTP` de doi ma API nay thanh token phien trong `data.token`, sau do dung header `Token` de goi cac API don hang.

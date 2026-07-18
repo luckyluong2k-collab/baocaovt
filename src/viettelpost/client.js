@@ -6,6 +6,31 @@ const { sleep } = require("../utils/time");
 const { normalizeOrder, mergeOrder } = require("../order/normalize");
 const { loadFieldMapping, listItemsFromResponse, getByPath } = require("./mapping");
 
+function formatVietnameseDate(date) {
+  const day = String(date.getDate()).padStart(2, "0");
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const year = date.getFullYear();
+  return `${day}/${month}/${year}`;
+}
+
+function defaultOrderFilterBody(daysBack) {
+  const to = new Date();
+  const from = new Date(to.getTime() - Math.max(1, daysBack || 30) * 24 * 60 * 60 * 1000);
+  return {
+    from_date: formatVietnameseDate(from),
+    to_date: formatVietnameseDate(to),
+    list_status: [],
+    list_inventory: [],
+    filter: ""
+  };
+}
+
+function parseJsonObject(value, fallback) {
+  if (!value) return fallback;
+  const parsed = JSON.parse(value);
+  return parsed && typeof parsed === "object" && !Array.isArray(parsed) ? parsed : fallback;
+}
+
 function buildUrl(baseUrl, routePath, params = {}) {
   if (!baseUrl || !routePath) {
     throw new Error("Chua cau hinh VIETTELPOST_API_BASE_URL hoac endpoint Viettel Post.");
@@ -14,7 +39,9 @@ function buildUrl(baseUrl, routePath, params = {}) {
     (current, [key, value]) => current.replaceAll(`:${key}`, encodeURIComponent(value)),
     routePath
   );
-  return new URL(expandedPath, baseUrl.endsWith("/") ? baseUrl : `${baseUrl}/`).toString();
+  const base = baseUrl.endsWith("/") ? baseUrl : `${baseUrl}/`;
+  const relativePath = expandedPath.replace(/^\/+/, "");
+  return new URL(relativePath, base).toString();
 }
 
 async function requestJson(url, options, retries = 3) {
@@ -46,8 +73,29 @@ class ViettelPostClient {
   }
 
   async authToken() {
-    if (this.config.viettelPost.token) return this.config.viettelPost.token;
     if (this.sessionToken) return this.sessionToken;
+
+    if (this.config.viettelPost.token && this.config.viettelPost.tokenLoginPath) {
+      const url = buildUrl(this.config.viettelPost.baseUrl, this.config.viettelPost.tokenLoginPath);
+      const raw = await requestJson(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          token: this.config.viettelPost.token
+        })
+      });
+      const tokenPath = this.mapping && this.mapping.auth && this.mapping.auth.tokenPath;
+      this.sessionToken = tokenPath ? getByPath(raw, tokenPath) : raw.token || (raw.data && raw.data.token) || "";
+      if (!this.sessionToken) {
+        throw new Error("Dang nhap Viettel Post bang API key thanh cong nhung khong tim thay data.token.");
+      }
+      return this.sessionToken;
+    }
+
+    if (this.config.viettelPost.token) return this.config.viettelPost.token;
+
     if (!this.config.viettelPost.username || !this.config.viettelPost.password || !this.config.viettelPost.loginPath) {
       return "";
     }
@@ -74,9 +122,12 @@ class ViettelPostClient {
 
   async headers() {
     const token = await this.authToken();
+    const authHeader = this.config.viettelPost.authHeader || "Token";
+    const authScheme = String(this.config.viettelPost.authScheme || "raw").toLowerCase();
+    const authValue = authScheme === "bearer" ? `Bearer ${token}` : token;
     return {
       "Content-Type": "application/json",
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      ...(token ? { [authHeader]: authValue } : {}),
       ...(this.config.viettelPost.customerId ? { "X-Customer-Id": this.config.viettelPost.customerId } : {})
     };
   }
@@ -90,7 +141,16 @@ class ViettelPostClient {
     const raw = await requestJson(url, {
       method,
       headers: await this.headers(),
-      ...(method === "GET" ? {} : { body: JSON.stringify({ customerId: this.config.viettelPost.customerId || undefined }) })
+      ...(method === "GET"
+        ? {}
+        : {
+            body: JSON.stringify(
+              parseJsonObject(
+                this.config.viettelPost.listOrdersBodyJson,
+                defaultOrderFilterBody(this.config.viettelPost.listOrdersDaysBack)
+              )
+            )
+          })
     });
     return listItemsFromResponse(raw, this.mapping).map((item) => normalizeOrder(item, this.mapping));
   }
