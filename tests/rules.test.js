@@ -9,8 +9,11 @@ const { diffWholeDays } = require("../src/utils/time");
 const config = {
   timezone: "Asia/Ho_Chi_Minh",
   alerts: {
-    lateDeliveryDays: 5,
-    lateDeliveryLevels: [5, 7, 10],
+    lateDeliveryDays: 3,
+    lateDeliveryDaysNorthCentral: 3,
+    lateDeliveryDaysSouth: 4,
+    lateDeliveryDaysUnknown: 3,
+    lateDeliveryLevels: [3, 4, 5, 7, 10],
     noUpdateHours: 48,
     missedCallThreshold: 2,
     missedContactSessionThreshold: 2,
@@ -19,7 +22,8 @@ const config = {
     missedContactSessionMinutes: 5,
     failedDeliveryThreshold: 2,
     codOverdueDays: 3,
-    maskPhone: true
+    maskPhone: true,
+    reportAlertTypes: ["LATE_DELIVERY", "COD_OVERDUE", "MISSED_CALLS"]
   }
 };
 
@@ -80,6 +84,21 @@ test("dem 3 cuoc goi nho lien tiep thanh 1 phien lien he", () => {
   assert.ok(result.alerts.some((alert) => alert.alertType === "MISSED_CALLS"));
 });
 
+test("khong canh bao goi nho neu moi dung 2 cuoc", () => {
+  const order = normalizeOrder({
+    trackingNumber: "A",
+    acceptedAt: "2026-07-16T08:00:00+07:00",
+    currentStatusName: "Đang giao hàng",
+    contactHistory: [
+      { type: "MISSED_CALL", direction: "SHIPPER_TO_RECEIVER", time: "18/07/2026 15:58:20" },
+      { type: "MISSED_CALL", direction: "SHIPPER_TO_RECEIVER", time: "18/07/2026 15:59:18" }
+    ]
+  });
+  const result = evaluateOrder(order, config, now);
+  assert.equal(result.metrics.missedCallCount, 2);
+  assert.equal(result.alerts.some((alert) => alert.alertType === "MISSED_CALLS"), false);
+});
+
 test("khong gui canh bao trung neu chu ky canh bao khong doi", () => {
   const alert = {
     trackingNumber: "A",
@@ -129,6 +148,54 @@ test("tang cap canh bao ngay 5, ngay 7, ngay 10", () => {
   assert.equal(day10.alertLevel, "day-10");
 });
 
+test("ap dung nguong giao cham theo mien nhan hang", () => {
+  const northDay3 = evaluateOrder(
+    normalizeOrder({
+      trackingNumber: "NORTH-3",
+      receiverProvince: "Hà Nội",
+      acceptedAt: "2026-07-15T10:00:00+07:00",
+      currentStatusName: "Đang vận chuyển"
+    }),
+    config,
+    now
+  );
+  const northDay4 = evaluateOrder(
+    normalizeOrder({
+      trackingNumber: "NORTH-4",
+      receiverProvince: "Hà Nội",
+      acceptedAt: "2026-07-14T10:00:00+07:00",
+      currentStatusName: "Đang vận chuyển"
+    }),
+    config,
+    now
+  );
+  const southDay4 = evaluateOrder(
+    normalizeOrder({
+      trackingNumber: "SOUTH-4",
+      receiverProvince: "Hồ Chí Minh",
+      acceptedAt: "2026-07-14T10:00:00+07:00",
+      currentStatusName: "Đang vận chuyển"
+    }),
+    config,
+    now
+  );
+  const southDay5 = evaluateOrder(
+    normalizeOrder({
+      trackingNumber: "SOUTH-5",
+      receiverProvince: "Hồ Chí Minh",
+      acceptedAt: "2026-07-13T10:00:00+07:00",
+      currentStatusName: "Đang vận chuyển"
+    }),
+    config,
+    now
+  );
+
+  assert.equal(northDay3.alerts.some((alert) => alert.alertType === "LATE_DELIVERY"), false);
+  assert.equal(northDay4.alerts.some((alert) => alert.alertType === "LATE_DELIVERY"), true);
+  assert.equal(southDay4.alerts.some((alert) => alert.alertType === "LATE_DELIVERY"), false);
+  assert.equal(southDay5.alerts.some((alert) => alert.alertType === "LATE_DELIVERY"), true);
+});
+
 test("khong canh bao giao cham cho don da giao thanh cong", () => {
   const result = evaluateOrder(
     normalizeOrder({
@@ -175,14 +242,14 @@ test("bao cao don chua giao hien dung thong tin van hanh", () => {
       { type: "MISSED_CALL", direction: "SHIPPER_TO_RECEIVER", time: "18/07/2026 16:00:16" }
     ]
   });
-  const { metrics } = evaluateOrder(order, config, now);
-  const messages = buildUndeliveredReportMessages([{ order, metrics }], config, now);
+  const { metrics, alerts } = evaluateOrder(order, config, now);
+  const messages = buildUndeliveredReportMessages([{ order, metrics, alerts }], config, now);
 
   assert.equal(messages.length, 1);
-  assert.match(messages[0], /BÁO CÁO ĐƠN CHƯA GIAO THÀNH CÔNG/);
+  assert.match(messages[0], /BÁO CÁO VẬN HÀNH VIETTEL POST/);
   assert.match(messages[0], /VTP-MISSED-001/);
   assert.match(messages[0], /Gọi nhỡ:<\/b> 3/);
-  assert.match(messages[0], /Phiên:<\/b> 1/);
+  assert.match(messages[0], /Ship gọi nhỡ quá ngưỡng/);
   assert.match(messages[0], /<code>SHOP-MISSED-001<\/code>/);
   assert.match(messages[0], /<code>092\*\*\*\*444<\/code>/);
 });

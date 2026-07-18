@@ -49,6 +49,15 @@ function csvEnv(name, fallback) {
     .sort((a, b) => a - b);
 }
 
+function stringCsvEnv(name, fallback) {
+  const value = process.env[name];
+  if (!value) return fallback;
+  return value
+    .split(",")
+    .map((item) => item.trim())
+    .filter(Boolean);
+}
+
 function resolveProjectPath(value, fallback) {
   const chosen = value || fallback;
   if (!chosen) return "";
@@ -79,6 +88,8 @@ function getConfig() {
       listOrdersDaysBack: numberEnv("VIETTELPOST_LIST_ORDERS_DAYS_BACK", 30),
       orderDetailPath: process.env.VIETTELPOST_ORDER_DETAIL_PATH || "",
       orderDetailMethod: process.env.VIETTELPOST_ORDER_DETAIL_METHOD || "GET",
+      callLogPath: process.env.VIETTELPOST_CALL_LOG_PATH || "",
+      callLogMethod: process.env.VIETTELPOST_CALL_LOG_METHOD || "GET",
       authHeader: process.env.VIETTELPOST_AUTH_HEADER || "Token",
       authScheme: process.env.VIETTELPOST_AUTH_SCHEME || "raw",
       webhookSecret: process.env.VIETTELPOST_WEBHOOK_SECRET || "",
@@ -114,8 +125,11 @@ function getConfig() {
     },
 
     alerts: {
-      lateDeliveryDays: numberEnv("LATE_DELIVERY_DAYS", 5),
-      lateDeliveryLevels: csvEnv("LATE_DELIVERY_LEVELS", [5, 7, 10]),
+      lateDeliveryDays: numberEnv("LATE_DELIVERY_DAYS", 3),
+      lateDeliveryDaysNorthCentral: numberEnv("LATE_DELIVERY_DAYS_NORTH_CENTRAL", 3),
+      lateDeliveryDaysSouth: numberEnv("LATE_DELIVERY_DAYS_SOUTH", 4),
+      lateDeliveryDaysUnknown: numberEnv("LATE_DELIVERY_DAYS_UNKNOWN", 3),
+      lateDeliveryLevels: csvEnv("LATE_DELIVERY_LEVELS", [3, 4, 5, 7, 10]),
       noUpdateHours: numberEnv("NO_UPDATE_HOURS", 48),
       missedCallThreshold: numberEnv("MISSED_CALL_THRESHOLD", 2),
       missedContactSessionThreshold: numberEnv("MISSED_CONTACT_SESSION_THRESHOLD", 2),
@@ -124,7 +138,8 @@ function getConfig() {
       missedContactSessionMinutes: numberEnv("MISSED_CONTACT_SESSION_MINUTES", 5),
       failedDeliveryThreshold: numberEnv("FAILED_DELIVERY_THRESHOLD", 2),
       codOverdueDays: numberEnv("COD_OVERDUE_DAYS", 3),
-      maskPhone: boolEnv("MASK_PHONE", true)
+      maskPhone: boolEnv("MASK_PHONE", true),
+      reportAlertTypes: stringCsvEnv("REPORT_ALERT_TYPES", ["LATE_DELIVERY", "COD_OVERDUE", "MISSED_CALLS"])
     },
 
     storageDriver:

@@ -1,5 +1,6 @@
 const { includesAny, normalizeText } = require("../utils/text");
 const { dateKey, diffHours, diffWholeDays, parseDateValue } = require("../utils/time");
+const { detectDeliveryRegion } = require("../order/regions");
 
 const deliveredKeywords = ["giao thanh cong", "da giao hang", "delivered", "successfully delivered"];
 const canceledKeywords = ["huy don", "da huy", "cancelled", "canceled"];
@@ -26,6 +27,15 @@ const highReturnRiskKeywords = [
   "chuyen hoan",
   "return"
 ];
+const codReconciledKeywords = [
+  "da doi soat",
+  "doi soat xong",
+  "da thanh toan cod",
+  "da chuyen cod",
+  "paid",
+  "reconciled",
+  "completed"
+];
 
 function statusText(order) {
   return `${order.currentStatusCode || ""} ${order.currentStatusName || ""} ${order.failedDeliveryReason || ""}`;
@@ -45,6 +55,16 @@ function isReturnCompleted(order) {
 
 function isTerminal(order) {
   return isDelivered(order) || isCanceled(order) || isReturnCompleted(order);
+}
+
+function isTruthyValue(value) {
+  if (value === true || value === 1) return true;
+  const text = normalizeText(value);
+  return ["1", "true", "yes", "y", "da doi soat", "paid", "reconciled"].includes(text);
+}
+
+function isCodReconciled(order) {
+  return Boolean(order.codReconciledAt) || isTruthyValue(order.codReconciled) || includesAny(order.codReconciliationStatus, codReconciledKeywords);
 }
 
 function isReturningOrHighRisk(order) {
@@ -112,6 +132,16 @@ function alertLevelForDays(days, levels) {
   return `day-${reached[reached.length - 1]}`;
 }
 
+function deliveryStartAt(order) {
+  return order.acceptedAt || order.createdAt || null;
+}
+
+function lateDeliveryThresholdForRegion(region, config) {
+  if (region.code === "south") return config.alerts.lateDeliveryDaysSouth;
+  if (region.code === "north" || region.code === "central") return config.alerts.lateDeliveryDaysNorthCentral;
+  return config.alerts.lateDeliveryDaysUnknown || config.alerts.lateDeliveryDays;
+}
+
 function levelRank(level) {
   const match = String(level || "").match(/(\d+)/);
   return match ? Number(match[1]) : 0;
@@ -119,7 +149,7 @@ function levelRank(level) {
 
 function missedCallRuleMatched(metrics, config) {
   const mode = String(config.alerts.missedCallAlertMode || "COUNT").toUpperCase();
-  const byCount = metrics.missedCallCount >= config.alerts.missedCallThreshold;
+  const byCount = metrics.missedCallCount > config.alerts.missedCallThreshold;
   const bySessions = metrics.missedContactSessions >= config.alerts.missedContactSessionThreshold;
   const byDays = metrics.missedCallDays >= config.alerts.missedCallDifferentDaysThreshold;
 
@@ -132,15 +162,24 @@ function missedCallRuleMatched(metrics, config) {
 function getOrderMetrics(order, config, now) {
   const calls = missedCalls(order);
   const deliveryAttempts = countDeliveryAttempts(order);
+  const region = detectDeliveryRegion(order);
+  const lateDeliveryThresholdDays = lateDeliveryThresholdForRegion(region, config);
+  const startAt = deliveryStartAt(order);
 
   return {
-    deliveryDays: diffWholeDays(order.acceptedAt, now),
+    deliveryDays: diffWholeDays(startAt, now),
+    deliveryStartAt: startAt,
+    daysSinceDelivered: diffWholeDays(order.deliveredAt, now),
     hoursSinceUpdate: diffHours(order.lastUpdatedAt, now),
     missedCallCount: calls.length,
     missedContactSessions: countMissedContactSessions(calls, config.alerts.missedContactSessionMinutes),
     missedCallDays: countMissedCallDays(calls, config.timezone),
     deliveryAttempts,
-    failedDeliveryReason: latestFailedDeliveryReason(order)
+    failedDeliveryReason: latestFailedDeliveryReason(order),
+    deliveryRegionCode: region.code,
+    deliveryRegionName: region.name,
+    deliveryProvince: region.province,
+    lateDeliveryThresholdDays
   };
 }
 
@@ -159,6 +198,12 @@ function baseAlert(order, metrics, alertType, alertLevel, title, reason) {
     missedCallDays: metrics.missedCallDays,
     deliveryAttempts: metrics.deliveryAttempts,
     failedDeliveryReason: metrics.failedDeliveryReason || order.failedDeliveryReason || "",
+    deliveryStartAt: metrics.deliveryStartAt || null,
+    daysSinceDelivered: metrics.daysSinceDelivered,
+    deliveryRegionCode: metrics.deliveryRegionCode || "",
+    deliveryRegionName: metrics.deliveryRegionName || "",
+    deliveryProvince: metrics.deliveryProvince || "",
+    lateDeliveryThresholdDays: metrics.lateDeliveryThresholdDays,
     lastUpdatedAt: order.lastUpdatedAt || null,
     order
   };
@@ -169,7 +214,7 @@ function evaluateOrder(order, config, now = new Date()) {
   const alerts = [];
   const terminal = isTerminal(order);
 
-  if (!terminal && order.acceptedAt && metrics.deliveryDays >= config.alerts.lateDeliveryDays) {
+  if (!terminal && metrics.deliveryStartAt && metrics.deliveryDays > metrics.lateDeliveryThresholdDays) {
     const level = alertLevelForDays(metrics.deliveryDays, config.alerts.lateDeliveryLevels) || "late";
     alerts.push(
       baseAlert(
@@ -178,7 +223,7 @@ function evaluateOrder(order, config, now = new Date()) {
         "LATE_DELIVERY",
         level,
         level === "day-10" ? "Canh bao khan: don giao cham" : level === "day-7" ? "Canh bao nghiem trong: don giao cham" : "Canh bao giao cham",
-        `Don da duoc Viettel Post nhan ${metrics.deliveryDays} ngay nhung chua giao thanh cong.`
+        `Don thuoc ${metrics.deliveryRegionName}, da ${metrics.deliveryDays} ngay chua giao thanh cong, qua nguong ${metrics.lateDeliveryThresholdDays} ngay.`
       )
     );
   }
@@ -191,7 +236,7 @@ function evaluateOrder(order, config, now = new Date()) {
         "MISSED_CALLS",
         `calls-${metrics.missedCallCount}-sessions-${metrics.missedContactSessions}`,
         "Canh bao cuoc goi nho",
-        `Co ${metrics.missedCallCount} cuoc goi nho, gom ${metrics.missedContactSessions} phien lien he that bai.`
+        `Ship goi khach ${metrics.missedCallCount} cuoc goi nho, vuot nguong ${config.alerts.missedCallThreshold} cuoc.`
       )
     );
   }
@@ -235,8 +280,8 @@ function evaluateOrder(order, config, now = new Date()) {
     );
   }
 
-  if (isDelivered(order) && order.deliveredAt && !order.codReconciledAt) {
-    const daysSinceDelivered = diffWholeDays(order.deliveredAt, now);
+  if (isDelivered(order) && order.deliveredAt && !isCodReconciled(order)) {
+    const daysSinceDelivered = metrics.daysSinceDelivered;
     if (daysSinceDelivered > config.alerts.codOverdueDays) {
       alerts.push(
         baseAlert(
@@ -281,6 +326,7 @@ module.exports = {
   isCanceled,
   isReturnCompleted,
   isTerminal,
+  isCodReconciled,
   isReturningOrHighRisk,
   missedCalls,
   countMissedContactSessions,

@@ -33,20 +33,30 @@ function loadFieldMapping(filePath) {
   return JSON.parse(fs.readFileSync(filePath, "utf8"));
 }
 
-function listItemsFromResponse(raw, mapping) {
-  const path = mapping && mapping.listOrders && mapping.listOrders.itemsPath;
+function itemsFromResponse(raw, path) {
   const mapped = path ? getByPath(raw, path) : undefined;
   if (Array.isArray(mapped)) return mapped;
   if (Array.isArray(raw)) return raw;
   if (Array.isArray(raw && raw.data)) return raw.data;
   if (Array.isArray(raw && raw.orders)) return raw.orders;
+  if (Array.isArray(raw && raw.logs)) return raw.logs;
+  if (Array.isArray(raw && raw.data && raw.logs)) return raw.data.logs;
   if (Array.isArray(raw && raw.data && raw.data.orders)) return raw.data.orders;
   return [];
+}
+
+function listItemsFromResponse(raw, mapping) {
+  return itemsFromResponse(raw, mapping && mapping.listOrders && mapping.listOrders.itemsPath);
+}
+
+function listCallLogsFromResponse(raw, mapping) {
+  return itemsFromResponse(raw, mapping && mapping.callLog && mapping.callLog.itemsPath);
 }
 
 module.exports = {
   getByPath,
   firstMapped,
   loadFieldMapping,
-  listItemsFromResponse
+  listItemsFromResponse,
+  listCallLogsFromResponse
 };

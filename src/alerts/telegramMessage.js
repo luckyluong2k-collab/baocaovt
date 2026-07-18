@@ -32,6 +32,7 @@ function titleForAlert(alert) {
   if (alert.alertType === "COD_OVERDUE") return "🚨 COD CHƯA ĐỐI SOÁT";
   if (alert.alertType === "NO_UPDATE") return "🚨 ĐƠN KHÔNG CẬP NHẬT";
   if (alert.alertType === "LATE_DELIVERY") return "🚨 ĐƠN GIAO CHẬM";
+  if (alert.alertType === "MISSED_CALLS") return "🚨 SHIP GỌI NHỠ QUÁ NGƯỠNG";
   return "🚨 ĐƠN CÓ NGUY CƠ HOÀN";
 }
 
@@ -49,9 +50,11 @@ function buildTelegramMessage(alert, config) {
     `<b>Khách hàng:</b> ${escapeHtml(order.receiverName)}`,
     `<b>Số điện thoại:</b> ${htmlCode(phone)}`,
     `<b>COD:</b> ${escapeHtml(formatMoney(order.codAmount))}`,
+    `<b>Vùng nhận:</b> ${escapeHtml(alert.deliveryRegionName || "")}${alert.deliveryProvince ? ` - ${escapeHtml(alert.deliveryProvince)}` : ""}`,
     `<b>Trạng thái:</b> ${escapeHtml(order.currentStatusName || alert.statusName)}`,
-    `<b>Ngày Viettel Post nhận:</b> ${escapeHtml(formatDateTime(order.acceptedAt, timezone))}`,
+    `<b>Ngày tính hạn:</b> ${escapeHtml(formatDateTime(alert.deliveryStartAt || order.acceptedAt, timezone))}`,
     `<b>Số ngày vận chuyển:</b> ${escapeHtml(alert.deliveryDays)}`,
+    `<b>Ngưỡng quá hạn:</b> ${escapeHtml(alert.lateDeliveryThresholdDays || "")} ngày`,
     `<b>Cuộc gọi nhỡ:</b> ${escapeHtml(alert.missedCallCount)}`,
     `<b>Số phiên liên hệ thất bại:</b> ${escapeHtml(alert.missedContactSessions)}`,
     `<b>Số lần giao thất bại:</b> ${escapeHtml(alert.deliveryAttempts)}`,

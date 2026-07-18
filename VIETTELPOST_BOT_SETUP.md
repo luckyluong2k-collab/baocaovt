@@ -31,6 +31,8 @@ VIETTELPOST_LIST_ORDERS_PATH=/order/order-filter?page=1
 VIETTELPOST_LIST_ORDERS_METHOD=POST
 VIETTELPOST_ORDER_DETAIL_PATH=/core/orders/query?code=:trackingNumber
 VIETTELPOST_ORDER_DETAIL_METHOD=GET
+VIETTELPOST_CALL_LOG_PATH=/order/call-log?orderNumber=:trackingNumber
+VIETTELPOST_CALL_LOG_METHOD=GET
 VIETTELPOST_AUTH_HEADER=Token
 VIETTELPOST_AUTH_SCHEME=raw
 TELEGRAM_BOT_TOKEN=
@@ -115,7 +117,7 @@ Invoke-RestMethod -Method Post `
   -Uri "http://localhost:8787/api/viettelpost/check-now"
 ```
 
-Gui bao cao danh sach don chua giao thanh cong vao Telegram:
+Gui bao cao van hanh vao Telegram:
 
 ```powershell
 npm run report:undelivered
@@ -199,6 +201,8 @@ VIETTELPOST_LIST_ORDERS_PATH=/order/order-filter?page=1
 VIETTELPOST_LIST_ORDERS_METHOD=POST
 VIETTELPOST_ORDER_DETAIL_PATH=/core/orders/query?code=:trackingNumber
 VIETTELPOST_ORDER_DETAIL_METHOD=GET
+VIETTELPOST_CALL_LOG_PATH=/order/call-log?orderNumber=:trackingNumber
+VIETTELPOST_CALL_LOG_METHOD=GET
 VIETTELPOST_AUTH_HEADER=Token
 VIETTELPOST_AUTH_SCHEME=raw
 VIETTELPOST_FIELD_MAPPING_FILE=viettelpost-field-mapping.example.json
@@ -226,7 +230,27 @@ Mo file sample va tim cac field co y nghia nhu:
 
 Neu API khong tra lich su cuoc goi, bot van hoat dong bang trang thai, lich su trang thai va ly do giao that bai.
 
-## 11. Doc log va xu ly loi
+## 11. Luat bao cao van hanh
+
+Mac dinh bot bao cao cac nhom sau:
+
+- Mien Bac/Mien Trung: don chua giao thanh cong qua 3 ngay.
+- Mien Nam: don chua giao thanh cong qua 4 ngay.
+- COD: don da giao thanh cong qua 3 ngay nhung chua doi soat COD.
+- Cuoc goi: ship goi khach qua 2 cuoc goi nho.
+
+Co the doi bang bien moi truong:
+
+```env
+LATE_DELIVERY_DAYS_NORTH_CENTRAL=3
+LATE_DELIVERY_DAYS_SOUTH=4
+LATE_DELIVERY_DAYS_UNKNOWN=3
+MISSED_CALL_THRESHOLD=2
+COD_OVERDUE_DAYS=3
+REPORT_ALERT_TYPES=LATE_DELIVERY,COD_OVERDUE,MISSED_CALLS
+```
+
+## 12. Doc log va xu ly loi
 
 Du lieu bot luu tai:
 
@@ -243,7 +267,7 @@ Cac nhom du lieu:
 
 Log duoc an token, password, authorization header va secret.
 
-## 12. Bao mat
+## 13. Bao mat
 
 - Khong commit `.env`.
 - Khong dan token vao source code.
@@ -252,7 +276,7 @@ Log duoc an token, password, authorization header va secret.
 - Bat rate limit mac dinh cho `check-now` va `test-telegram`.
 - Khong luu token Viettel Post hoac Telegram vao database.
 
-## 13. Cac endpoint noi bo
+## 14. Cac endpoint noi bo
 
 ```text
 GET  /api/viettelpost/health
@@ -268,7 +292,7 @@ POST /api/viettelpost/webhook
 
 Mac dinh cac endpoint doc du lieu cung duoc bao ve neu `PROTECT_READ_ENDPOINTS=true`.
 
-## 14. Deploy len Firebase
+## 15. Deploy len Firebase
 
 Du an da co cau hinh Firebase Functions trong `firebase-entry.js` va `firebase.json`.
 

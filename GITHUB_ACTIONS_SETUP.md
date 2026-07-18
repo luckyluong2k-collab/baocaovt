@@ -7,7 +7,7 @@ GitHub Actions se tu mo may ao, cai Node.js, chay bot, gui Telegram, roi tat may
 Da tao 2 workflow:
 
 - `.github/workflows/viettelpost-check.yml`: kiem tra canh bao moi gio, cron `17 * * * *`.
-- `.github/workflows/viettelpost-undelivered-report.yml`: gui bao cao don chua giao luc 08:10 gio Viet Nam, cron `10 1 * * *`.
+- `.github/workflows/viettelpost-undelivered-report.yml`: gui bao cao van hanh luc 08:10 gio Viet Nam, cron `10 1 * * *`.
 
 Co the chay thu cong trong tab `Actions` cua GitHub bang nut `Run workflow`.
 
@@ -88,8 +88,16 @@ VIETTELPOST_LIST_ORDERS_METHOD=POST
 VIETTELPOST_LIST_ORDERS_DAYS_BACK=30
 VIETTELPOST_ORDER_DETAIL_PATH=/core/orders/query?code=:trackingNumber
 VIETTELPOST_ORDER_DETAIL_METHOD=GET
+VIETTELPOST_CALL_LOG_PATH=/order/call-log?orderNumber=:trackingNumber
+VIETTELPOST_CALL_LOG_METHOD=GET
 VIETTELPOST_AUTH_HEADER=Token
 VIETTELPOST_AUTH_SCHEME=raw
+LATE_DELIVERY_DAYS_NORTH_CENTRAL=3
+LATE_DELIVERY_DAYS_SOUTH=4
+LATE_DELIVERY_DAYS_UNKNOWN=3
+MISSED_CALL_THRESHOLD=2
+COD_OVERDUE_DAYS=3
+REPORT_ALERT_TYPES=LATE_DELIVERY,COD_OVERDUE,MISSED_CALLS
 ```
 
 Khi muon bat chay tu dong:
@@ -123,6 +131,8 @@ VIETTELPOST_LIST_ORDERS_PATH=/order/order-filter?page=1
 VIETTELPOST_LIST_ORDERS_METHOD=POST
 VIETTELPOST_ORDER_DETAIL_PATH=/core/orders/query?code=:trackingNumber
 VIETTELPOST_ORDER_DETAIL_METHOD=GET
+VIETTELPOST_CALL_LOG_PATH=/order/call-log?orderNumber=:trackingNumber
+VIETTELPOST_CALL_LOG_METHOD=GET
 VIETTELPOST_AUTH_HEADER=Token
 VIETTELPOST_AUTH_SCHEME=raw
 ```
@@ -130,3 +140,10 @@ VIETTELPOST_AUTH_SCHEME=raw
 Token/mat khau dat trong GitHub Secrets, khong dat trong Variables.
 
 `VIETTELPOST_TOKEN` la ma API lay trong Partner Viettel Post. Bot se tu goi `/user/loginVTP` de doi ma API nay thanh token phien trong `data.token`, sau do dung header `Token` de goi cac API don hang.
+
+## Luat bao cao hien tai
+
+- Mien Bac va mien Trung: don chua giao thanh cong qua 3 ngay se vao bao cao.
+- Mien Nam: don chua giao thanh cong qua 4 ngay se vao bao cao.
+- COD: don da giao thanh cong qua 3 ngay nhung chua co doi soat se vao bao cao.
+- Cuoc goi: ship goi khach qua 2 cuoc goi nho se vao bao cao.

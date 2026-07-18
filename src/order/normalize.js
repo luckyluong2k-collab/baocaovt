@@ -7,6 +7,31 @@ const orderFallbackPaths = {
   orderCode: ["orderCode", "order_code", "shopOrderCode", "ORDER_CODE", "data.orderCode"],
   receiverName: ["receiverName", "receiver_name", "customerName", "RECEIVER_FULLNAME", "data.receiverName"],
   receiverPhone: ["receiverPhone", "receiver_phone", "phone", "RECEIVER_PHONE", "data.receiverPhone"],
+  receiverProvince: [
+    "receiverProvince",
+    "receiver_province",
+    "receiverProvinceName",
+    "RECEIVER_PROVINCE",
+    "RECEIVER_PROVINCE_NAME",
+    "data.receiverProvince"
+  ],
+  receiverDistrict: [
+    "receiverDistrict",
+    "receiver_district",
+    "receiverDistrictName",
+    "RECEIVER_DISTRICT",
+    "RECEIVER_DISTRICT_NAME",
+    "data.receiverDistrict"
+  ],
+  receiverWard: ["receiverWard", "receiver_ward", "receiverWardName", "RECEIVER_WARD", "RECEIVER_WARD_NAME", "data.receiverWard"],
+  receiverAddress: [
+    "receiverAddress",
+    "receiver_address",
+    "address",
+    "RECEIVER_ADDRESS",
+    "RECEIVER_FULL_ADDRESS",
+    "data.receiverAddress"
+  ],
   senderPhone: ["senderPhone", "sender_phone", "SENDER_PHONE", "data.senderPhone"],
   codAmount: ["codAmount", "cod_amount", "moneyCollection", "MONEY_COLLECTION", "data.codAmount"],
   createdAt: ["createdAt", "created_at", "createdDate", "ORDER_DATE", "data.createdAt"],
@@ -19,7 +44,24 @@ const orderFallbackPaths = {
   contactHistory: ["contactHistory", "contact_history", "calls", "data.contactHistory"],
   events: ["events", "histories", "statusHistory", "data.events"],
   deliveredAt: ["deliveredAt", "delivered_at", "data.deliveredAt"],
-  codReconciledAt: ["codReconciledAt", "cod_reconciled_at", "data.codReconciledAt"],
+  codReconciledAt: [
+    "codReconciledAt",
+    "cod_reconciled_at",
+    "codPaidAt",
+    "cod_paid_at",
+    "reconciledAt",
+    "MONEY_COLLECTION_DATE",
+    "COD_PAYMENT_DATE",
+    "data.codReconciledAt"
+  ],
+  codReconciled: ["codReconciled", "cod_reconciled", "isCodReconciled", "IS_COD_RECONCILED", "data.codReconciled"],
+  codReconciliationStatus: [
+    "codReconciliationStatus",
+    "cod_reconciliation_status",
+    "codPaymentStatus",
+    "COD_PAYMENT_STATUS",
+    "data.codReconciliationStatus"
+  ],
   postOfficeName: ["postOfficeName", "post_office_name", "data.postOfficeName"],
   shipperName: ["shipperName", "shipper_name", "data.shipperName"],
   shipperPhone: ["shipperPhone", "shipper_phone", "data.shipperPhone"]
@@ -111,6 +153,10 @@ function normalizeOrder(raw, mapping = {}) {
     orderCode: String(mapped(raw, mapping, "order", "orderCode") || "").trim(),
     receiverName: String(mapped(raw, mapping, "order", "receiverName") || "").trim(),
     receiverPhone: String(mapped(raw, mapping, "order", "receiverPhone") || "").trim(),
+    receiverProvince: String(mapped(raw, mapping, "order", "receiverProvince") || "").trim(),
+    receiverDistrict: String(mapped(raw, mapping, "order", "receiverDistrict") || "").trim(),
+    receiverWard: String(mapped(raw, mapping, "order", "receiverWard") || "").trim(),
+    receiverAddress: String(mapped(raw, mapping, "order", "receiverAddress") || "").trim(),
     senderPhone: String(mapped(raw, mapping, "order", "senderPhone") || "").trim(),
     codAmount: toNumber(mapped(raw, mapping, "order", "codAmount")),
     createdAt: isoOrNull(mapped(raw, mapping, "order", "createdAt")),
@@ -124,6 +170,8 @@ function normalizeOrder(raw, mapping = {}) {
     events,
     deliveredAt: isoOrNull(mapped(raw, mapping, "order", "deliveredAt")),
     codReconciledAt: isoOrNull(mapped(raw, mapping, "order", "codReconciledAt")),
+    codReconciled: mapped(raw, mapping, "order", "codReconciled"),
+    codReconciliationStatus: String(mapped(raw, mapping, "order", "codReconciliationStatus") || "").trim(),
     postOfficeName: String(mapped(raw, mapping, "order", "postOfficeName") || "").trim(),
     shipperName: String(mapped(raw, mapping, "order", "shipperName") || "").trim(),
     shipperPhone: String(mapped(raw, mapping, "order", "shipperPhone") || "").trim(),

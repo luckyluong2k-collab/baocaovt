@@ -3,8 +3,8 @@ const path = require("path");
 const { parseCsv, toNumber } = require("../utils/csv");
 const { sanitize } = require("../utils/sanitize");
 const { sleep } = require("../utils/time");
-const { normalizeOrder, mergeOrder } = require("../order/normalize");
-const { loadFieldMapping, listItemsFromResponse, getByPath } = require("./mapping");
+const { normalizeContactHistory, normalizeOrder, mergeOrder } = require("../order/normalize");
+const { loadFieldMapping, listCallLogsFromResponse, listItemsFromResponse, getByPath } = require("./mapping");
 
 function formatVietnameseDate(date) {
   const day = String(date.getDate()).padStart(2, "0");
@@ -229,10 +229,43 @@ class ViettelPostClient {
     return normalizeOrder(raw, this.mapping);
   }
 
+  async getCallLogs(trackingNumber) {
+    if (!trackingNumber || !this.config.viettelPost.callLogPath) return [];
+    const url = buildUrl(this.config.viettelPost.baseUrl, this.config.viettelPost.callLogPath, {
+      trackingNumber,
+      orderNumber: trackingNumber
+    });
+    const method = this.config.viettelPost.callLogMethod.toUpperCase();
+    const raw = await requestJson(url, {
+      method,
+      headers: await this.headers(),
+      ...(method === "GET" ? {} : { body: JSON.stringify({ orderNumber: trackingNumber, trackingNumber }) })
+    });
+    return normalizeContactHistory(listCallLogsFromResponse(raw, this.mapping), this.mapping);
+  }
+
+  mergeContactHistory(order, callLogs) {
+    if (!Array.isArray(callLogs) || callLogs.length === 0) return order;
+    const seen = new Set();
+    const contactHistory = [...(order.contactHistory || []), ...callLogs].filter((contact) => {
+      const key = [contact.type, contact.direction, contact.time, contact.shipperPhone].join("|");
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+    return { ...order, contactHistory };
+  }
+
   async hydrateOrder(baseOrder) {
     if (this.config.useMockData || !baseOrder || !baseOrder.trackingNumber) return baseOrder;
     const detail = await this.getOrderDetail(baseOrder.trackingNumber);
-    return detail ? mergeOrder(baseOrder, detail) : baseOrder;
+    const order = detail ? mergeOrder(baseOrder, detail) : baseOrder;
+
+    try {
+      return this.mergeContactHistory(order, await this.getCallLogs(order.trackingNumber));
+    } catch (error) {
+      return order;
+    }
   }
 
   async captureSanitizedSample(trackingNumber, outputPath) {

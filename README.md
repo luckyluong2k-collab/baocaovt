@@ -4,6 +4,13 @@ Bot Node.js theo doi van don Viettel Post va gui canh bao Telegram.
 
 Firebase project hien tai: `baocaovt-e3ca9`.
 
+Luat bao cao hien tai:
+
+- Mien Bac/Mien Trung qua 3 ngay chua giao.
+- Mien Nam qua 4 ngay chua giao.
+- COD qua 3 ngay sau khi giao ma chua doi soat.
+- Ship goi khach qua 2 cuoc goi nho.
+
 Chay nhanh bang mock data:
 
 ```powershell
