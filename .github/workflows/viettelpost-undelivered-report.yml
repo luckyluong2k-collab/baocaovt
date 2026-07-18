@@ -3,7 +3,7 @@ name: Viettel Post - Bao cao don chua giao
 on:
   workflow_dispatch:
   schedule:
-    - cron: "10 1 * * *"
+    - cron: "0 0,13 * * *"
 
 permissions:
   contents: read
@@ -57,6 +57,9 @@ jobs:
       FAILED_DELIVERY_THRESHOLD: ${{ vars.FAILED_DELIVERY_THRESHOLD || '2' }}
       COD_OVERDUE_DAYS: ${{ vars.COD_OVERDUE_DAYS || '3' }}
       REPORT_ALERT_TYPES: ${{ vars.REPORT_ALERT_TYPES || 'LATE_DELIVERY,COD_OVERDUE,MISSED_CALLS' }}
+      REPORT_MAX_ROWS: ${{ vars.REPORT_MAX_ROWS || '80' }}
+      BC4_OVER_DAYS: ${{ vars.BC4_OVER_DAYS || '4' }}
+      REVENUE_SCAN_DAYS_BACK: ${{ vars.REVENUE_SCAN_DAYS_BACK || '3650' }}
       MASK_PHONE: ${{ vars.MASK_PHONE || 'false' }}
       TIMEZONE: Asia/Ho_Chi_Minh
       STORAGE_DRIVER: file

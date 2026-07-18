@@ -7,6 +7,7 @@ function emptyDb() {
     viettelpost_orders: {},
     viettelpost_order_events: {},
     viettelpost_alerts: {},
+    viettelpost_revenue_ledger: {},
     viettelpost_bot_logs: []
   };
 }
@@ -97,6 +98,53 @@ class FileStore {
 
   async listAlerts() {
     return Object.values(this.db.viettelpost_alerts).sort((a, b) => String(b.sentAt).localeCompare(String(a.sentAt)));
+  }
+
+  async upsertRevenueOrders(orders) {
+    this.db.viettelpost_revenue_ledger = this.db.viettelpost_revenue_ledger || {};
+    let insertedCount = 0;
+    let updatedCount = 0;
+
+    for (const order of orders || []) {
+      const trackingNumber = order.trackingNumber;
+      if (!trackingNumber) continue;
+      const existing = this.db.viettelpost_revenue_ledger[trackingNumber] || null;
+      const document = {
+        ...(existing || {}),
+        trackingNumber,
+        orderCode: order.orderCode || (existing && existing.orderCode) || "",
+        receiverName: order.receiverName || (existing && existing.receiverName) || "",
+        receiverPhone: order.receiverPhone || (existing && existing.receiverPhone) || "",
+        codAmount: Number(order.codAmount || (existing && existing.codAmount) || 0),
+        deliveredAt: order.deliveredAt || (existing && existing.deliveredAt) || null,
+        createdAt: order.createdAt || (existing && existing.createdAt) || null,
+        acceptedAt: order.acceptedAt || (existing && existing.acceptedAt) || null,
+        statusName: order.currentStatusName || (existing && existing.statusName) || "",
+        firstRecordedAt: (existing && existing.firstRecordedAt) || new Date().toISOString(),
+        lastSeenAt: new Date().toISOString()
+      };
+
+      this.db.viettelpost_revenue_ledger[trackingNumber] = sanitize(document);
+      if (existing) updatedCount += 1;
+      else insertedCount += 1;
+    }
+
+    return { insertedCount, updatedCount };
+  }
+
+  async getRevenueSummary() {
+    const entries = Object.values(this.db.viettelpost_revenue_ledger || {});
+    const dates = entries
+      .map((entry) => entry.deliveredAt || entry.createdAt || entry.acceptedAt)
+      .filter(Boolean)
+      .sort();
+    return {
+      orderCount: entries.length,
+      totalRevenue: entries.reduce((total, entry) => total + Number(entry.codAmount || 0), 0),
+      firstOrderAt: dates[0] || null,
+      lastOrderAt: dates[dates.length - 1] || null,
+      updatedAt: new Date().toISOString()
+    };
   }
 
   getLastAlert(trackingNumber, alertType) {

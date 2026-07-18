@@ -123,6 +123,55 @@ class FirestoreStore {
     return snapshot.docs.map((doc) => doc.data());
   }
 
+  async upsertRevenueOrders(orders) {
+    let insertedCount = 0;
+    let updatedCount = 0;
+
+    for (const order of orders || []) {
+      const trackingNumber = order.trackingNumber;
+      if (!trackingNumber) continue;
+      const reference = this.db.collection("viettelpost_revenue_ledger").doc(trackingNumber);
+      const existing = await reference.get();
+      const existingData = existing.exists ? existing.data() : {};
+      const document = sanitize({
+        ...existingData,
+        trackingNumber,
+        orderCode: order.orderCode || existingData.orderCode || "",
+        receiverName: order.receiverName || existingData.receiverName || "",
+        receiverPhone: order.receiverPhone || existingData.receiverPhone || "",
+        codAmount: Number(order.codAmount || existingData.codAmount || 0),
+        deliveredAt: order.deliveredAt || existingData.deliveredAt || null,
+        createdAt: order.createdAt || existingData.createdAt || null,
+        acceptedAt: order.acceptedAt || existingData.acceptedAt || null,
+        statusName: order.currentStatusName || existingData.statusName || "",
+        firstRecordedAt: existingData.firstRecordedAt || new Date().toISOString(),
+        lastSeenAt: new Date().toISOString()
+      });
+
+      await reference.set(document, { merge: true });
+      if (existing.exists) updatedCount += 1;
+      else insertedCount += 1;
+    }
+
+    return { insertedCount, updatedCount };
+  }
+
+  async getRevenueSummary() {
+    const snapshot = await this.db.collection("viettelpost_revenue_ledger").limit(10000).get();
+    const entries = snapshot.docs.map((doc) => doc.data());
+    const dates = entries
+      .map((entry) => entry.deliveredAt || entry.createdAt || entry.acceptedAt)
+      .filter(Boolean)
+      .sort();
+    return {
+      orderCount: entries.length,
+      totalRevenue: entries.reduce((total, entry) => total + Number(entry.codAmount || 0), 0),
+      firstOrderAt: dates[0] || null,
+      lastOrderAt: dates[dates.length - 1] || null,
+      updatedAt: new Date().toISOString()
+    };
+  }
+
   async getLastAlert(trackingNumber, alertType) {
     const snapshot = await this.db.collection("viettelpost_alerts").doc(`${trackingNumber}:${alertType}`).get();
     return snapshot.exists ? snapshot.data() : null;

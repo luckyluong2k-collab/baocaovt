@@ -37,6 +37,7 @@ VIETTELPOST_AUTH_HEADER=Token
 VIETTELPOST_AUTH_SCHEME=raw
 TELEGRAM_BOT_TOKEN=
 TELEGRAM_CHAT_ID=
+TELEGRAM_WEBHOOK_SECRET=
 ADMIN_API_KEY=
 TELEGRAM_DRY_RUN=false
 ```
@@ -121,6 +122,16 @@ Gui bao cao van hanh vao Telegram:
 
 ```powershell
 npm run report:undelivered
+```
+
+Gui tung loai bao cao:
+
+```powershell
+npm run report:bc1
+npm run report:bc2
+npm run report:bc3
+npm run report:bc4
+npm run report:bc5
 ```
 
 Hoac qua API noi bo:
@@ -248,9 +259,36 @@ LATE_DELIVERY_DAYS_UNKNOWN=3
 MISSED_CALL_THRESHOLD=2
 COD_OVERDUE_DAYS=3
 REPORT_ALERT_TYPES=LATE_DELIVERY,COD_OVERDUE,MISSED_CALLS
+REPORT_MAX_ROWS=80
+BC4_OVER_DAYS=4
+REVENUE_SCAN_DAYS_BACK=3650
 ```
 
-## 12. Doc log va xu ly loi
+## 12. Lenh Telegram
+
+Khi co server/Firebase/Cloud Run online va Telegram webhook duoc tro vao bot, co the goi trong group:
+
+```text
+/bc1  Liet ke cac don dang giao hang
+/bc2  Liet ke cac don dang can xu ly
+/bc3  Liet ke cac don cho phat lai
+/bc4  Liet ke cac don giao qua 4 ngay
+/bc5  Tong hop doanh thu luy tien
+```
+
+Endpoint nhan lenh Telegram:
+
+```text
+POST /api/telegram/webhook
+```
+
+Neu dat `TELEGRAM_WEBHOOK_SECRET`, khi goi Telegram `setWebhook` can dung cung secret token de Telegram gui header `x-telegram-bot-api-secret-token`.
+
+GitHub Actions mien phi khong nhan lenh Telegram truc tiep; no chi gui bao cao theo lich.
+
+`/bc5` luu doanh thu theo ma van don da giao co COD vao `viettelpost_revenue_ledger`. Neu app Viettel Post xoa bot lich su cu sau vai thang, cac ma da tung duoc bot ghi van con trong so luy tien nay.
+
+## 13. Doc log va xu ly loi
 
 Du lieu bot luu tai:
 
@@ -264,10 +302,11 @@ Cac nhom du lieu:
 - `viettelpost_order_events`
 - `viettelpost_alerts`
 - `viettelpost_bot_logs`
+- `viettelpost_revenue_ledger`
 
 Log duoc an token, password, authorization header va secret.
 
-## 13. Bao mat
+## 14. Bao mat
 
 - Khong commit `.env`.
 - Khong dan token vao source code.
@@ -276,7 +315,7 @@ Log duoc an token, password, authorization header va secret.
 - Bat rate limit mac dinh cho `check-now` va `test-telegram`.
 - Khong luu token Viettel Post hoac Telegram vao database.
 
-## 14. Cac endpoint noi bo
+## 15. Cac endpoint noi bo
 
 ```text
 GET  /api/viettelpost/health
@@ -288,11 +327,12 @@ POST /api/viettelpost/test-telegram
 POST /api/viettelpost/report-undelivered
 POST /api/viettelpost/import
 POST /api/viettelpost/webhook
+POST /api/telegram/webhook
 ```
 
 Mac dinh cac endpoint doc du lieu cung duoc bao ve neu `PROTECT_READ_ENDPOINTS=true`.
 
-## 15. Deploy len Firebase
+## 16. Deploy len Firebase
 
 Du an da co cau hinh Firebase Functions trong `firebase-entry.js` va `firebase.json`.
 

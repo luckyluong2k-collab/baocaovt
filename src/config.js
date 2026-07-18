@@ -108,7 +108,8 @@ function getConfig() {
     telegram: {
       botToken: process.env.TELEGRAM_BOT_TOKEN || "",
       chatId: process.env.TELEGRAM_CHAT_ID || "",
-      dryRun: boolEnv("TELEGRAM_DRY_RUN", true)
+      dryRun: boolEnv("TELEGRAM_DRY_RUN", true),
+      webhookSecret: process.env.TELEGRAM_WEBHOOK_SECRET || ""
     },
 
     api: {
@@ -140,6 +141,15 @@ function getConfig() {
       codOverdueDays: numberEnv("COD_OVERDUE_DAYS", 3),
       maskPhone: boolEnv("MASK_PHONE", true),
       reportAlertTypes: stringCsvEnv("REPORT_ALERT_TYPES", ["LATE_DELIVERY", "COD_OVERDUE", "MISSED_CALLS"])
+    },
+
+    reports: {
+      maxRowsPerReport: numberEnv("REPORT_MAX_ROWS", 80),
+      bc4OverDays: numberEnv("BC4_OVER_DAYS", 4)
+    },
+
+    revenue: {
+      scanDaysBack: numberEnv("REVENUE_SCAN_DAYS_BACK", 3650)
     },
 
     storageDriver:

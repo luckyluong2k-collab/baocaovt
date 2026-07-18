@@ -11,6 +11,7 @@ const VIETTELPOST_TOKEN = defineSecret("VIETTELPOST_TOKEN");
 const VIETTELPOST_PASSWORD = defineSecret("VIETTELPOST_PASSWORD");
 const ADMIN_API_KEY = defineSecret("ADMIN_API_KEY");
 const VIETTELPOST_WEBHOOK_SECRET = defineSecret("VIETTELPOST_WEBHOOK_SECRET");
+const TELEGRAM_WEBHOOK_SECRET = defineSecret("TELEGRAM_WEBHOOK_SECRET");
 
 const runtimeOptions = {
   region: "asia-southeast1",
@@ -21,7 +22,8 @@ const runtimeOptions = {
     VIETTELPOST_TOKEN,
     VIETTELPOST_PASSWORD,
     ADMIN_API_KEY,
-    VIETTELPOST_WEBHOOK_SECRET
+    VIETTELPOST_WEBHOOK_SECRET,
+    TELEGRAM_WEBHOOK_SECRET
   ]
 };
 
@@ -37,6 +39,7 @@ function applyFirebaseRuntimeEnv() {
   process.env.ADMIN_API_KEY = ADMIN_API_KEY.value() || process.env.ADMIN_API_KEY || "";
   process.env.VIETTELPOST_WEBHOOK_SECRET =
     VIETTELPOST_WEBHOOK_SECRET.value() || process.env.VIETTELPOST_WEBHOOK_SECRET || "";
+  process.env.TELEGRAM_WEBHOOK_SECRET = TELEGRAM_WEBHOOK_SECRET.value() || process.env.TELEGRAM_WEBHOOK_SECRET || "";
 }
 
 exports.api = onRequest(runtimeOptions, async (request, response) => {
@@ -62,7 +65,7 @@ exports.scheduledCheck = onSchedule(
 exports.scheduledUndeliveredReport = onSchedule(
   {
     ...runtimeOptions,
-    schedule: "0 8 * * *",
+    schedule: "0 7,20 * * *",
     timeZone: "Asia/Ho_Chi_Minh"
   },
   async () => {

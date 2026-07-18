@@ -7,6 +7,7 @@ const { normalizeOrder } = require("./order/normalize");
 const { sendUndeliveredReport } = require("./reports/undeliveredReport");
 const { runBotCheck } = require("./scheduler");
 const { getStore } = require("./store");
+const { handleTelegramUpdate } = require("./telegram/commands");
 const { sendTelegramMessage } = require("./telegram/client");
 const { parseCsv, toNumber } = require("./utils/csv");
 const { sanitize, sanitizeError } = require("./utils/sanitize");
@@ -142,6 +143,20 @@ async function handleWebhook(request, response, config) {
   sendJson(response, 200, { ok: true, accepted: true, trackingNumber: order.trackingNumber || "", sentAlerts });
 }
 
+async function handleTelegramWebhook(request, response, config) {
+  if (config.telegram.webhookSecret) {
+    const secret = request.headers["x-telegram-bot-api-secret-token"];
+    if (secret !== config.telegram.webhookSecret) {
+      sendJson(response, 401, { ok: false, error: "Telegram webhook secret khong hop le." });
+      return;
+    }
+  }
+
+  const update = parseBody(request, await readBody(request));
+  const result = await handleTelegramUpdate(update, config);
+  sendJson(response, 200, result);
+}
+
 async function router(request, response, config = getConfig()) {
   const url = new URL(request.url, `http://${request.headers.host || "localhost"}`);
   const method = request.method || "GET";
@@ -227,6 +242,11 @@ async function router(request, response, config = getConfig()) {
 
     if (method === "POST" && path === "/api/viettelpost/webhook") {
       await handleWebhook(request, response, config);
+      return;
+    }
+
+    if (method === "POST" && path === "/api/telegram/webhook") {
+      await handleTelegramWebhook(request, response, config);
       return;
     }
 

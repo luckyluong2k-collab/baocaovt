@@ -1,7 +1,8 @@
 const { sanitize } = require("../utils/sanitize");
 
-async function sendTelegramMessage(htmlMessage, config) {
-  const { botToken, chatId, dryRun } = config.telegram;
+async function sendTelegramMessage(htmlMessage, config, options = {}) {
+  const { botToken, dryRun } = config.telegram;
+  const chatId = options.chatId || config.telegram.chatId;
   if (dryRun || !botToken || !chatId) {
     return {
       ok: true,
@@ -20,7 +21,8 @@ async function sendTelegramMessage(htmlMessage, config) {
       chat_id: chatId,
       text: htmlMessage,
       parse_mode: "HTML",
-      disable_web_page_preview: true
+      disable_web_page_preview: true,
+      ...(options.replyToMessageId ? { reply_to_message_id: options.replyToMessageId } : {})
     })
   });
 

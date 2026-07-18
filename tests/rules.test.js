@@ -3,6 +3,7 @@ const assert = require("node:assert/strict");
 const { evaluateOrder, isDelivered, isReturningOrHighRisk, shouldSendAlert } = require("../src/alerts/rules");
 const { normalizeOrder } = require("../src/order/normalize");
 const { buildUndeliveredReportMessages } = require("../src/reports/undeliveredReport");
+const { buildRevenueReportMessages, isInDelivery, isWaitingRedelivery, reportRowsForCode } = require("../src/reports/operationsReport");
 const { sanitize, redactString } = require("../src/utils/sanitize");
 const { diffWholeDays } = require("../src/utils/time");
 
@@ -24,6 +25,13 @@ const config = {
     codOverdueDays: 3,
     maskPhone: true,
     reportAlertTypes: ["LATE_DELIVERY", "COD_OVERDUE", "MISSED_CALLS"]
+  },
+  reports: {
+    maxRowsPerReport: 80,
+    bc4OverDays: 4
+  },
+  revenue: {
+    scanDaysBack: 3650
   }
 };
 
@@ -246,10 +254,61 @@ test("bao cao don chua giao hien dung thong tin van hanh", () => {
   const messages = buildUndeliveredReportMessages([{ order, metrics, alerts }], config, now);
 
   assert.equal(messages.length, 1);
-  assert.match(messages[0], /BÁO CÁO VẬN HÀNH VIETTEL POST/);
+  assert.match(messages[0], /\/BC2/);
   assert.match(messages[0], /VTP-MISSED-001/);
   assert.match(messages[0], /Gọi nhỡ:<\/b> 3/);
   assert.match(messages[0], /Ship gọi nhỡ quá ngưỡng/);
   assert.match(messages[0], /<code>SHOP-MISSED-001<\/code>/);
   assert.match(messages[0], /<code>092\*\*\*\*444<\/code>/);
+});
+
+test("phan loai cac bao cao bc1 bc3 bc4", () => {
+  const delivering = normalizeOrder({
+    trackingNumber: "BC1",
+    acceptedAt: "2026-07-17T10:00:00+07:00",
+    currentStatusName: "Đang giao hàng"
+  });
+  const redelivery = normalizeOrder({
+    trackingNumber: "BC3",
+    acceptedAt: "2026-07-17T10:00:00+07:00",
+    currentStatusName: "Chờ phát lại",
+    failedDeliveryReason: "Khách hẹn giao lại"
+  });
+  const late = normalizeOrder({
+    trackingNumber: "BC4",
+    acceptedAt: "2026-07-12T10:00:00+07:00",
+    currentStatusName: "Đang vận chuyển"
+  });
+  const rows = [delivering, redelivery, late].map((order) => {
+    const result = evaluateOrder(order, config, now);
+    return { order, metrics: result.metrics, alerts: result.alerts };
+  });
+
+  assert.equal(isInDelivery(delivering), true);
+  assert.equal(isWaitingRedelivery(redelivery), true);
+  assert.ok(reportRowsForCode("bc1", rows, config).some((row) => row.order.trackingNumber === "BC1"));
+  assert.ok(reportRowsForCode("bc3", rows, config).some((row) => row.order.trackingNumber === "BC3"));
+  assert.ok(reportRowsForCode("bc4", rows, config).some((row) => row.order.trackingNumber === "BC4"));
+});
+
+test("bao cao doanh thu luy tien hien tong tien va so don", () => {
+  const messages = buildRevenueReportMessages(
+    {
+      insertedCount: 2,
+      updatedCount: 0,
+      summary: {
+        totalRevenue: 1500000,
+        orderCount: 2,
+        firstOrderAt: "2026-07-01T10:00:00+07:00",
+        lastOrderAt: "2026-07-18T10:00:00+07:00"
+      }
+    },
+    config,
+    now
+  );
+
+  assert.equal(messages.length, 1);
+  assert.match(messages[0], /\/BC5/);
+  assert.match(messages[0], /1.500.000/);
+  assert.match(messages[0], /Số đơn đã ghi:<\/b> 2/);
 });

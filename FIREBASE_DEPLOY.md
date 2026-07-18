@@ -43,6 +43,7 @@ firebase.cmd functions:secrets:set VIETTELPOST_TOKEN --project baocaovt-e3ca9
 firebase.cmd functions:secrets:set VIETTELPOST_PASSWORD --project baocaovt-e3ca9
 firebase.cmd functions:secrets:set ADMIN_API_KEY --project baocaovt-e3ca9
 firebase.cmd functions:secrets:set VIETTELPOST_WEBHOOK_SECRET --project baocaovt-e3ca9
+firebase.cmd functions:secrets:set TELEGRAM_WEBHOOK_SECRET --project baocaovt-e3ca9
 ```
 
 Neu chua co mat khau Viettel Post/webhook secret thi co the dien gia tri tam nhu `unused`, sau nay cap nhat lai.
@@ -62,6 +63,7 @@ POST /api/viettelpost/check-now
 POST /api/viettelpost/report-undelivered
 POST /api/viettelpost/test-telegram
 POST /api/viettelpost/webhook
+POST /api/telegram/webhook
 ```
 
 ## Lich chay tu dong
@@ -69,7 +71,7 @@ POST /api/viettelpost/webhook
 Da tao 2 Firebase scheduled functions:
 
 - `scheduledCheck`: kiem tra canh bao moi 60 phut.
-- `scheduledUndeliveredReport`: gui bao cao don chua giao luc 08:00 theo gio Viet Nam, nhung chi chay khi bat `SEND_DAILY_UNDELIVERED_REPORT=true`.
+- `scheduledUndeliveredReport`: gui bao cao van hanh luc 07:00 va 20:00 theo gio Viet Nam, nhung chi chay khi bat `SEND_DAILY_UNDELIVERED_REPORT=true`.
 
 Mac dinh `scheduledCheck` dang bi khoa boi `ENABLE_SCHEDULED_CHECK=false` de tranh gui mock data khi chua co API Viettel Post that.
 
@@ -80,6 +82,7 @@ Khi chay tren Firebase, bot dung Firestore:
 - `viettelpost_orders`
 - `viettelpost_order_events`
 - `viettelpost_alerts`
+- `viettelpost_revenue_ledger`
 - `viettelpost_bot_logs`
 
 Khong luu Telegram token, mat khau hoac API token vao Firestore.

@@ -11,6 +11,16 @@ Luat bao cao hien tai:
 - COD qua 3 ngay sau khi giao ma chua doi soat.
 - Ship goi khach qua 2 cuoc goi nho.
 
+Lich GitHub Actions: tu dong gui bao cao luc 07:00 va 20:00 gio Viet Nam.
+
+Lenh Telegram da ho tro khi co webhook/server online:
+
+- `/bc1`: don dang giao hang.
+- `/bc2`: don dang can xu ly.
+- `/bc3`: don cho phat lai.
+- `/bc4`: don giao qua 4 ngay.
+- `/bc5`: doanh thu luy tien da luu.
+
 Chay nhanh bang mock data:
 
 ```powershell

@@ -3,7 +3,8 @@ const secrets = [
   "VIETTELPOST_TOKEN",
   "VIETTELPOST_PASSWORD",
   "ADMIN_API_KEY",
-  "VIETTELPOST_WEBHOOK_SECRET"
+  "VIETTELPOST_WEBHOOK_SECRET",
+  "TELEGRAM_WEBHOOK_SECRET"
 ];
 
 console.log("Chay cac lenh sau va dan gia tri khi Firebase CLI hoi. Khong ghi secret vao file:");

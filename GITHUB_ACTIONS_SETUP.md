@@ -7,7 +7,7 @@ GitHub Actions se tu mo may ao, cai Node.js, chay bot, gui Telegram, roi tat may
 Da tao 2 workflow:
 
 - `.github/workflows/viettelpost-check.yml`: kiem tra canh bao moi gio, cron `17 * * * *`.
-- `.github/workflows/viettelpost-undelivered-report.yml`: gui bao cao van hanh luc 08:10 gio Viet Nam, cron `10 1 * * *`.
+- `.github/workflows/viettelpost-undelivered-report.yml`: gui bao cao van hanh luc 07:00 va 20:00 gio Viet Nam, cron `0 0,13 * * *`.
 
 Co the chay thu cong trong tab `Actions` cua GitHub bang nut `Run workflow`.
 
@@ -98,6 +98,9 @@ LATE_DELIVERY_DAYS_UNKNOWN=3
 MISSED_CALL_THRESHOLD=2
 COD_OVERDUE_DAYS=3
 REPORT_ALERT_TYPES=LATE_DELIVERY,COD_OVERDUE,MISSED_CALLS
+REPORT_MAX_ROWS=80
+BC4_OVER_DAYS=4
+REVENUE_SCAN_DAYS_BACK=3650
 ```
 
 Khi muon bat chay tu dong:
@@ -147,3 +150,23 @@ Token/mat khau dat trong GitHub Secrets, khong dat trong Variables.
 - Mien Nam: don chua giao thanh cong qua 4 ngay se vao bao cao.
 - COD: don da giao thanh cong qua 3 ngay nhung chua co doi soat se vao bao cao.
 - Cuoc goi: ship goi khach qua 2 cuoc goi nho se vao bao cao.
+
+## Lenh Telegram
+
+GitHub Actions chi chay theo lich, khong nhan lenh Telegram truc tiep. Cac lenh duoi day se dung khi co server/webhook online:
+
+```text
+/bc1  Don dang giao hang
+/bc2  Don dang can xu ly
+/bc3  Don cho phat lai
+/bc4  Don giao qua 4 ngay
+/bc5  Doanh thu luy tien da luu
+```
+
+Endpoint webhook Telegram:
+
+```text
+POST /api/telegram/webhook
+```
+
+`/bc5` ghi doanh thu theo ma van don da giao co COD vao `viettelpost_revenue_ledger`, de lan sau van giu tong luy tien neu app Viettel Post xoa bot lich su cu.
