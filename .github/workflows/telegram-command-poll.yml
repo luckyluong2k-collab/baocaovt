@@ -2,8 +2,6 @@ name: Telegram - Doc lenh bao cao
 
 on:
   workflow_dispatch:
-  schedule:
-    - cron: "*/5 * * * *"
 
 permissions:
   contents: read
@@ -17,7 +15,7 @@ jobs:
   poll:
     name: Doc lenh Telegram
     runs-on: ubuntu-latest
-    if: github.event_name == 'workflow_dispatch' || vars.ENABLE_TELEGRAM_COMMAND_POLLING == 'true'
+    if: github.event_name == 'workflow_dispatch'
 
     env:
       USE_MOCK_DATA: ${{ vars.USE_MOCK_DATA || 'false' }}
