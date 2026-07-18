@@ -1,0 +1,37 @@
+{
+  "trackingNumber": "VTP-LATE-001",
+  "orderCode": "SHOP-LATE-001",
+  "receiverName": "Tran Thi Giao Cham",
+  "receiverPhone": "0912222333",
+  "senderPhone": "0982222333",
+  "codAmount": 2150000,
+  "createdAt": "2026-07-09T09:00:00+07:00",
+  "acceptedAt": "2026-07-10T10:00:00+07:00",
+  "lastUpdatedAt": "2026-07-17T09:30:00+07:00",
+  "currentStatusCode": "IN_TRANSIT",
+  "currentStatusName": "Đang vận chuyển",
+  "deliveryAttempts": 0,
+  "failedDeliveryReason": "",
+  "contactHistory": [],
+  "events": [
+    {
+      "time": "2026-07-10T10:00:00+07:00",
+      "statusCode": "ACCEPTED",
+      "statusName": "Viettel Post đã nhận hàng",
+      "reason": "",
+      "postOfficeName": "Bưu cục Hà Nam"
+    },
+    {
+      "time": "2026-07-17T09:30:00+07:00",
+      "statusCode": "IN_TRANSIT",
+      "statusName": "Đang vận chuyển",
+      "reason": "",
+      "postOfficeName": "Bưu cục Đà Nẵng"
+    }
+  ],
+  "deliveredAt": null,
+  "codReconciledAt": null,
+  "postOfficeName": "Bưu cục Đà Nẵng",
+  "shipperName": "",
+  "shipperPhone": ""
+}

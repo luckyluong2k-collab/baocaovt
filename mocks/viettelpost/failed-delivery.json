@@ -1,0 +1,47 @@
+{
+  "trackingNumber": "VTP-FAILED-001",
+  "orderCode": "SHOP-FAILED-001",
+  "receiverName": "Pham Thi That Bai",
+  "receiverPhone": "0934444555",
+  "senderPhone": "0984444555",
+  "codAmount": 1750000,
+  "createdAt": "2026-07-14T08:00:00+07:00",
+  "acceptedAt": "2026-07-14T11:00:00+07:00",
+  "lastUpdatedAt": "2026-07-18T11:30:00+07:00",
+  "currentStatusCode": "DELIVERY_FAILED",
+  "currentStatusName": "Giao không thành công",
+  "deliveryAttempts": 2,
+  "failedDeliveryReason": "Khách không nghe máy",
+  "contactHistory": [],
+  "events": [
+    {
+      "time": "2026-07-14T11:00:00+07:00",
+      "statusCode": "ACCEPTED",
+      "statusName": "Viettel Post đã nhận hàng",
+      "reason": ""
+    },
+    {
+      "time": "2026-07-17T10:00:00+07:00",
+      "statusCode": "DELIVERY_FAILED",
+      "statusName": "Giao không thành công",
+      "reason": "Không liên lạc được",
+      "postOfficeName": "Bưu cục Cầu Giấy",
+      "shipperName": "Anh Khoa",
+      "shipperPhone": "0977777000"
+    },
+    {
+      "time": "2026-07-18T11:30:00+07:00",
+      "statusCode": "DELIVERY_FAILED",
+      "statusName": "Giao không thành công",
+      "reason": "Khách không nghe máy",
+      "postOfficeName": "Bưu cục Cầu Giấy",
+      "shipperName": "Anh Khoa",
+      "shipperPhone": "0977777000"
+    }
+  ],
+  "deliveredAt": null,
+  "codReconciledAt": null,
+  "postOfficeName": "Bưu cục Cầu Giấy",
+  "shipperName": "Anh Khoa",
+  "shipperPhone": "0977777000"
+}

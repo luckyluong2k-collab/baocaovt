@@ -1,0 +1,68 @@
+{
+  "trackingNumber": "VTP-MISSED-001",
+  "orderCode": "SHOP-MISSED-001",
+  "receiverName": "Le Van Goi Nho",
+  "receiverPhone": "0923333444",
+  "senderPhone": "0983333444",
+  "codAmount": 980000,
+  "createdAt": "2026-07-16T08:00:00+07:00",
+  "acceptedAt": "2026-07-16T13:00:00+07:00",
+  "lastUpdatedAt": "2026-07-18T16:00:16+07:00",
+  "currentStatusCode": "DELIVERING",
+  "currentStatusName": "Đang giao hàng",
+  "deliveryAttempts": 0,
+  "failedDeliveryReason": "",
+  "contactHistory": [
+    {
+      "type": "MISSED_CALL",
+      "direction": "SHIPPER_TO_RECEIVER",
+      "time": "18/07/2026 15:58:20",
+      "durationSeconds": 0,
+      "shipperName": "Anh Bao",
+      "shipperPhone": "0988888000"
+    },
+    {
+      "type": "MISSED_CALL",
+      "direction": "SHIPPER_TO_RECEIVER",
+      "time": "18/07/2026 15:59:18",
+      "durationSeconds": 0,
+      "shipperName": "Anh Bao",
+      "shipperPhone": "0988888000"
+    },
+    {
+      "type": "MISSED_CALL",
+      "direction": "SHIPPER_TO_RECEIVER",
+      "time": "18/07/2026 16:00:16",
+      "durationSeconds": 0,
+      "shipperName": "Anh Bao",
+      "shipperPhone": "0988888000"
+    },
+    {
+      "type": "ANSWERED_CALL",
+      "direction": "RECEIVER_TO_SHIPPER",
+      "time": "18/07/2026 16:03:00",
+      "durationSeconds": 35,
+      "shipperName": "Anh Bao",
+      "shipperPhone": "0988888000"
+    }
+  ],
+  "events": [
+    {
+      "time": "2026-07-16T13:00:00+07:00",
+      "statusCode": "ACCEPTED",
+      "statusName": "Viettel Post đã nhận hàng",
+      "reason": ""
+    },
+    {
+      "time": "2026-07-18T16:00:16+07:00",
+      "statusCode": "DELIVERING",
+      "statusName": "Đang giao hàng",
+      "reason": ""
+    }
+  ],
+  "deliveredAt": null,
+  "codReconciledAt": null,
+  "postOfficeName": "Bưu cục TP.HCM",
+  "shipperName": "Anh Bao",
+  "shipperPhone": "0988888000"
+}

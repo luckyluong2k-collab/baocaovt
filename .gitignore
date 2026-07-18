@@ -1,0 +1,14 @@
+.env
+.env.*
+!.env.example
+!.env.firebase.example
+node_modules/
+storage/
+data/tracking-numbers.csv
+data/*.sanitized.json
+npm-debug.log*
+yarn-error.log*
+.firebase/
+firebase-debug.log
+firebase-debug.*.log
+.DS_Store

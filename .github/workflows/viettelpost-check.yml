@@ -1,0 +1,89 @@
+name: Viettel Post - Kiem tra canh bao
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "17 * * * *"
+
+permissions:
+  contents: read
+  actions: write
+
+concurrency:
+  group: viettelpost-check
+  cancel-in-progress: false
+
+jobs:
+  check:
+    name: Kiem tra van don
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch' || vars.ENABLE_SCHEDULED_CHECK == 'true'
+
+    env:
+      USE_MOCK_DATA: ${{ vars.USE_MOCK_DATA || 'false' }}
+      ORDER_SOURCE: ${{ vars.ORDER_SOURCE || 'csv' }}
+      TRACKING_CSV_PATH: data/tracking-numbers.csv
+      GOOGLE_SHEET_CSV_URL: ${{ secrets.GOOGLE_SHEET_CSV_URL }}
+      TELEGRAM_DRY_RUN: ${{ vars.TELEGRAM_DRY_RUN || 'false' }}
+      TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+      TELEGRAM_CHAT_ID: ${{ vars.TELEGRAM_CHAT_ID || '-1003931579210' }}
+      VIETTELPOST_API_BASE_URL: ${{ vars.VIETTELPOST_API_BASE_URL }}
+      VIETTELPOST_USERNAME: ${{ vars.VIETTELPOST_USERNAME }}
+      VIETTELPOST_PASSWORD: ${{ secrets.VIETTELPOST_PASSWORD }}
+      VIETTELPOST_TOKEN: ${{ secrets.VIETTELPOST_TOKEN }}
+      VIETTELPOST_CUSTOMER_ID: ${{ vars.VIETTELPOST_CUSTOMER_ID }}
+      VIETTELPOST_LOGIN_PATH: ${{ vars.VIETTELPOST_LOGIN_PATH }}
+      VIETTELPOST_LIST_ORDERS_PATH: ${{ vars.VIETTELPOST_LIST_ORDERS_PATH }}
+      VIETTELPOST_LIST_ORDERS_METHOD: ${{ vars.VIETTELPOST_LIST_ORDERS_METHOD || 'GET' }}
+      VIETTELPOST_ORDER_DETAIL_PATH: ${{ vars.VIETTELPOST_ORDER_DETAIL_PATH }}
+      VIETTELPOST_ORDER_DETAIL_METHOD: ${{ vars.VIETTELPOST_ORDER_DETAIL_METHOD || 'GET' }}
+      CHECK_INTERVAL_MINUTES: 60
+      LATE_DELIVERY_DAYS: ${{ vars.LATE_DELIVERY_DAYS || '5' }}
+      LATE_DELIVERY_LEVELS: ${{ vars.LATE_DELIVERY_LEVELS || '5,7,10' }}
+      NO_UPDATE_HOURS: ${{ vars.NO_UPDATE_HOURS || '48' }}
+      MISSED_CALL_THRESHOLD: ${{ vars.MISSED_CALL_THRESHOLD || '2' }}
+      MISSED_CONTACT_SESSION_THRESHOLD: ${{ vars.MISSED_CONTACT_SESSION_THRESHOLD || '2' }}
+      MISSED_CALL_ALERT_MODE: ${{ vars.MISSED_CALL_ALERT_MODE || 'COUNT' }}
+      MISSED_CONTACT_SESSION_MINUTES: ${{ vars.MISSED_CONTACT_SESSION_MINUTES || '5' }}
+      FAILED_DELIVERY_THRESHOLD: ${{ vars.FAILED_DELIVERY_THRESHOLD || '2' }}
+      COD_OVERDUE_DAYS: ${{ vars.COD_OVERDUE_DAYS || '3' }}
+      MASK_PHONE: ${{ vars.MASK_PHONE || 'false' }}
+      TIMEZONE: Asia/Ho_Chi_Minh
+      STORAGE_DRIVER: file
+      STORAGE_FILE: storage/viettelpost-db.json
+      TRACKING_NUMBERS_CSV: ${{ secrets.TRACKING_NUMBERS_CSV }}
+
+    steps:
+      - name: Lay source code
+        uses: actions/checkout@v4
+
+      - name: Cai Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Khoi phuc du lieu chong gui trung
+        uses: actions/cache@v4
+        with:
+          path: storage
+          key: viettelpost-bot-storage-${{ github.run_id }}
+          restore-keys: |
+            viettelpost-bot-storage-
+
+      - name: Ghi CSV tu GitHub Secret neu co
+        shell: bash
+        run: |
+          mkdir -p data storage
+          if [ -n "$TRACKING_NUMBERS_CSV" ]; then
+            printf "%s" "$TRACKING_NUMBERS_CSV" > data/tracking-numbers.csv
+          fi
+
+      - name: Cai thu vien
+        run: npm ci
+
+      - name: Chay test
+        run: npm test
+
+      - name: Kiem tra va gui canh bao
+        run: npm run check

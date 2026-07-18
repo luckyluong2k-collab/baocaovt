@@ -1,0 +1,53 @@
+{
+  "notes": [
+    "File mau de noi adapter voi JSON that cua Viettel Post.",
+    "Khong dien token hoac mat khau vao file nay.",
+    "Moi truong API that can duoc kiem tra truoc, sau do thay cac duong dan field ben duoi."
+  ],
+  "auth": {
+    "tokenPath": "data.token",
+    "expiresAtPath": "data.expiresAt"
+  },
+  "listOrders": {
+    "itemsPath": "data.orders"
+  },
+  "order": {
+    "trackingNumber": ["trackingNumber", "data.trackingNumber"],
+    "orderCode": ["orderCode", "data.orderCode"],
+    "receiverName": ["receiverName", "data.receiverName"],
+    "receiverPhone": ["receiverPhone", "data.receiverPhone"],
+    "senderPhone": ["senderPhone", "data.senderPhone"],
+    "codAmount": ["codAmount", "data.codAmount"],
+    "createdAt": ["createdAt", "data.createdAt"],
+    "acceptedAt": ["acceptedAt", "data.acceptedAt"],
+    "lastUpdatedAt": ["lastUpdatedAt", "data.lastUpdatedAt"],
+    "currentStatusCode": ["currentStatusCode", "data.currentStatusCode"],
+    "currentStatusName": ["currentStatusName", "data.currentStatusName"],
+    "deliveryAttempts": ["deliveryAttempts", "data.deliveryAttempts"],
+    "failedDeliveryReason": ["failedDeliveryReason", "data.failedDeliveryReason"],
+    "contactHistory": ["contactHistory", "data.contactHistory"],
+    "events": ["events", "data.events"],
+    "deliveredAt": ["deliveredAt", "data.deliveredAt"],
+    "codReconciledAt": ["codReconciledAt", "data.codReconciledAt"],
+    "postOfficeName": ["postOfficeName", "data.postOfficeName"],
+    "shipperName": ["shipperName", "data.shipperName"],
+    "shipperPhone": ["shipperPhone", "data.shipperPhone"]
+  },
+  "contactHistory": {
+    "type": ["type"],
+    "direction": ["direction"],
+    "time": ["time"],
+    "durationSeconds": ["durationSeconds"],
+    "shipperName": ["shipperName"],
+    "shipperPhone": ["shipperPhone"]
+  },
+  "event": {
+    "time": ["time"],
+    "statusCode": ["statusCode"],
+    "statusName": ["statusName"],
+    "reason": ["reason"],
+    "postOfficeName": ["postOfficeName"],
+    "shipperName": ["shipperName"],
+    "shipperPhone": ["shipperPhone"]
+  }
+}

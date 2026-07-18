@@ -1,0 +1,35 @@
+{
+  "trackingNumber": "VTP-NO-CONTACT-001",
+  "orderCode": "SHOP-NO-CONTACT-001",
+  "receiverName": "Do Thi Khong Cap Nhat",
+  "receiverPhone": "0956666777",
+  "senderPhone": "0986666777",
+  "codAmount": 430000,
+  "createdAt": "2026-07-14T08:00:00+07:00",
+  "acceptedAt": "2026-07-14T10:00:00+07:00",
+  "lastUpdatedAt": "2026-07-15T08:00:00+07:00",
+  "currentStatusCode": "IN_TRANSIT",
+  "currentStatusName": "Đang vận chuyển",
+  "deliveryAttempts": 0,
+  "failedDeliveryReason": "",
+  "contactHistory": [],
+  "events": [
+    {
+      "time": "2026-07-14T10:00:00+07:00",
+      "statusCode": "ACCEPTED",
+      "statusName": "Viettel Post đã nhận hàng",
+      "reason": ""
+    },
+    {
+      "time": "2026-07-15T08:00:00+07:00",
+      "statusCode": "IN_TRANSIT",
+      "statusName": "Đang vận chuyển",
+      "reason": ""
+    }
+  ],
+  "deliveredAt": null,
+  "codReconciledAt": null,
+  "postOfficeName": "Bưu cục Nha Trang",
+  "shipperName": "",
+  "shipperPhone": ""
+}

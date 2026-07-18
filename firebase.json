@@ -1,0 +1,18 @@
+{
+  "functions": [
+    {
+      "source": ".",
+      "runtime": "nodejs22",
+      "ignore": [
+        ".git",
+        ".env",
+        ".env.*",
+        "storage",
+        "tests",
+        "node_modules",
+        "firebase-debug.log",
+        "firebase-debug.*.log"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "trackingNumber": "VTP-DELIVERED-001",
+  "orderCode": "SHOP-DELIVERED-001",
+  "receiverName": "Nguyen Van Da Giao",
+  "receiverPhone": "0901111222",
+  "senderPhone": "0981111222",
+  "codAmount": 1200000,
+  "createdAt": "2026-07-10T09:00:00+07:00",
+  "acceptedAt": "2026-07-10T14:00:00+07:00",
+  "lastUpdatedAt": "2026-07-12T18:00:00+07:00",
+  "currentStatusCode": "DELIVERED",
+  "currentStatusName": "Đã giao thành công",
+  "deliveryAttempts": 1,
+  "failedDeliveryReason": "",
+  "contactHistory": [],
+  "events": [
+    {
+      "time": "2026-07-10T14:00:00+07:00",
+      "statusCode": "ACCEPTED",
+      "statusName": "Viettel Post đã nhận hàng",
+      "reason": "",
+      "postOfficeName": "Bưu cục Hà Nội"
+    },
+    {
+      "time": "2026-07-12T18:00:00+07:00",
+      "statusCode": "DELIVERED",
+      "statusName": "Đã giao thành công",
+      "reason": "",
+      "shipperName": "Anh Minh",
+      "shipperPhone": "0987654321"
+    }
+  ],
+  "deliveredAt": "2026-07-12T18:00:00+07:00",
+  "codReconciledAt": "2026-07-13T10:00:00+07:00",
+  "postOfficeName": "Bưu cục Hà Nội",
+  "shipperName": "Anh Minh",
+  "shipperPhone": "0987654321"
+}

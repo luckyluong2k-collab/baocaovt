@@ -1,0 +1,35 @@
+{
+  "trackingNumber": "VTP-RETURNING-001",
+  "orderCode": "SHOP-RETURNING-001",
+  "receiverName": "Hoang Van Hoan",
+  "receiverPhone": "0945555666",
+  "senderPhone": "0985555666",
+  "codAmount": 650000,
+  "createdAt": "2026-07-13T08:00:00+07:00",
+  "acceptedAt": "2026-07-13T12:00:00+07:00",
+  "lastUpdatedAt": "2026-07-18T09:00:00+07:00",
+  "currentStatusCode": "RETURNING",
+  "currentStatusName": "Chờ chuyển hoàn",
+  "deliveryAttempts": 1,
+  "failedDeliveryReason": "Khách từ chối nhận",
+  "contactHistory": [],
+  "events": [
+    {
+      "time": "2026-07-13T12:00:00+07:00",
+      "statusCode": "ACCEPTED",
+      "statusName": "Viettel Post đã nhận hàng",
+      "reason": ""
+    },
+    {
+      "time": "2026-07-18T09:00:00+07:00",
+      "statusCode": "RETURNING",
+      "statusName": "Chờ chuyển hoàn",
+      "reason": "Khách từ chối nhận"
+    }
+  ],
+  "deliveredAt": null,
+  "codReconciledAt": null,
+  "postOfficeName": "Bưu cục Hải Phòng",
+  "shipperName": "Chị Linh",
+  "shipperPhone": "0966666000"
+}
