@@ -25,6 +25,8 @@ Neu dung GitHub Actions mien phi, workflow `Telegram - Doc lenh bao cao` se doc 
 
 Workflow `Telegram - Cai goi y lenh` dung de dang ky menu goi y khi go `/` trong Telegram.
 
+Ban Google Apps Script + Google Sheet nam trong `google-apps-script/`.
+
 Chay nhanh bang mock data:
 
 ```powershell
