@@ -18,6 +18,7 @@
     "report:bc5": "node scripts/send-report.js bc5",
     "report:undelivered": "node scripts/send-undelivered-report.js",
     "telegram:poll": "node scripts/poll-telegram.js",
+    "telegram:commands": "node scripts/setup-telegram-commands.js",
     "test": "node --test tests/*.test.js",
     "capture:sample": "node scripts/capture-viettelpost-sample.js",
     "deploy:firebase": "firebase deploy --only functions",

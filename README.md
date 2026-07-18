@@ -23,6 +23,8 @@ Lenh Telegram da ho tro khi co webhook/server online:
 
 Neu dung GitHub Actions mien phi, workflow `Telegram - Doc lenh bao cao` se doc va tra loi lenh moi 5 phut.
 
+Workflow `Telegram - Cai goi y lenh` dung de dang ky menu goi y khi go `/` trong Telegram.
+
 Chay nhanh bang mock data:
 
 ```powershell

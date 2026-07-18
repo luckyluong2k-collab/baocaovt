@@ -1,0 +1,33 @@
+name: Telegram - Cai goi y lenh
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  setup:
+    name: Cai goi y lenh Telegram
+    runs-on: ubuntu-latest
+
+    env:
+      TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+      TELEGRAM_CHAT_ID: ${{ vars.TELEGRAM_CHAT_ID || '-1003931579210' }}
+      TELEGRAM_DRY_RUN: "false"
+
+    steps:
+      - name: Lay source code
+        uses: actions/checkout@v4
+
+      - name: Cai Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Cai thu vien
+        run: npm ci
+
+      - name: Cai goi y lenh Telegram
+        run: npm run telegram:commands
