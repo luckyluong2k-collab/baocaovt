@@ -41,10 +41,10 @@ function doPost(e) {
   try {
     const update = JSON.parse((e && e.postData && e.postData.contents) || "{}");
     handleTelegramUpdate_(update);
-    return ContentService.createTextOutput("ok");
+    return HtmlService.createHtmlOutput("ok");
   } catch (error) {
     log_("ERROR", error.message || String(error), "", 0, "", JSON.stringify({ stack: error.stack || "" }));
-    return ContentService.createTextOutput("error");
+    return HtmlService.createHtmlOutput("error");
   }
 }
 
