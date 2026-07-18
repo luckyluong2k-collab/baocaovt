@@ -4,10 +4,11 @@
 
 GitHub Actions se tu mo may ao, cai Node.js, chay bot, gui Telegram, roi tat may ao.
 
-Da tao 2 workflow:
+Da tao 3 workflow:
 
 - `.github/workflows/viettelpost-check.yml`: kiem tra canh bao moi gio, cron `17 * * * *`.
 - `.github/workflows/viettelpost-undelivered-report.yml`: gui bao cao van hanh luc 07:00 va 20:00 gio Viet Nam, cron `0 0,13 * * *`.
+- `.github/workflows/telegram-command-poll.yml`: doc lenh `/bc1` den `/bc5` moi 5 phut, cron `*/5 * * * *`.
 
 Co the chay thu cong trong tab `Actions` cua GitHub bang nut `Run workflow`.
 
@@ -81,6 +82,7 @@ TELEGRAM_DRY_RUN=false
 MASK_PHONE=false
 ENABLE_SCHEDULED_CHECK=false
 SEND_DAILY_UNDELIVERED_REPORT=false
+ENABLE_TELEGRAM_COMMAND_POLLING=true
 VIETTELPOST_API_BASE_URL=https://partner.viettelpost.vn/v2
 VIETTELPOST_TOKEN_LOGIN_PATH=/user/loginVTP
 VIETTELPOST_LIST_ORDERS_PATH=/order/order-filter?page=1
@@ -153,7 +155,7 @@ Token/mat khau dat trong GitHub Secrets, khong dat trong Variables.
 
 ## Lenh Telegram
 
-GitHub Actions chi chay theo lich, khong nhan lenh Telegram truc tiep. Cac lenh duoi day se dung khi co server/webhook online:
+Neu bat `ENABLE_TELEGRAM_COMMAND_POLLING=true`, GitHub Actions se doc lenh moi 5 phut. Luu y GitHub co the tre them vai phut khi he thong dong.
 
 ```text
 /bc1  Don dang giao hang
@@ -163,7 +165,7 @@ GitHub Actions chi chay theo lich, khong nhan lenh Telegram truc tiep. Cac lenh 
 /bc5  Doanh thu luy tien da luu
 ```
 
-Endpoint webhook Telegram:
+Neu co server/webhook online thi bot co the tra loi gan nhu ngay lap tuc qua endpoint:
 
 ```text
 POST /api/telegram/webhook

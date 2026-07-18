@@ -21,6 +21,8 @@ Lenh Telegram da ho tro khi co webhook/server online:
 - `/bc4`: don giao qua 4 ngay.
 - `/bc5`: doanh thu luy tien da luu.
 
+Neu dung GitHub Actions mien phi, workflow `Telegram - Doc lenh bao cao` se doc va tra loi lenh moi 5 phut.
+
 Chay nhanh bang mock data:
 
 ```powershell

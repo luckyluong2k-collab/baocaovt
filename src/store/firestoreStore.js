@@ -172,6 +172,20 @@ class FirestoreStore {
     };
   }
 
+  async getTelegramUpdateOffset() {
+    const snapshot = await this.db.collection("viettelpost_bot_state").doc("telegram").get();
+    return snapshot.exists ? Number(snapshot.data().updateOffset || 0) : 0;
+  }
+
+  async setTelegramUpdateOffset(offset) {
+    const document = {
+      updateOffset: Number(offset || 0),
+      updatedAt: new Date().toISOString()
+    };
+    await this.db.collection("viettelpost_bot_state").doc("telegram").set(document, { merge: true });
+    return document;
+  }
+
   async getLastAlert(trackingNumber, alertType) {
     const snapshot = await this.db.collection("viettelpost_alerts").doc(`${trackingNumber}:${alertType}`).get();
     return snapshot.exists ? snapshot.data() : null;

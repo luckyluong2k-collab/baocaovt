@@ -8,6 +8,7 @@ function emptyDb() {
     viettelpost_order_events: {},
     viettelpost_alerts: {},
     viettelpost_revenue_ledger: {},
+    telegram_state: {},
     viettelpost_bot_logs: []
   };
 }
@@ -145,6 +146,19 @@ class FileStore {
       lastOrderAt: dates[dates.length - 1] || null,
       updatedAt: new Date().toISOString()
     };
+  }
+
+  async getTelegramUpdateOffset() {
+    return Number((this.db.telegram_state && this.db.telegram_state.updateOffset) || 0);
+  }
+
+  async setTelegramUpdateOffset(offset) {
+    this.db.telegram_state = {
+      ...(this.db.telegram_state || {}),
+      updateOffset: Number(offset || 0),
+      updatedAt: new Date().toISOString()
+    };
+    return this.db.telegram_state;
   }
 
   getLastAlert(trackingNumber, alertType) {

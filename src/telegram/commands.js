@@ -16,7 +16,11 @@ function commandHelpMessage() {
 }
 
 function parseCommand(text) {
-  const match = String(text || "").trim().match(/^\/([a-zA-Z0-9_]+)(?:@[a-zA-Z0-9_]+)?(?:\s+(.*))?$/);
+  const line = String(text || "")
+    .split(/\r?\n/)
+    .map((item) => item.trim())
+    .find((item) => item.startsWith("/"));
+  const match = String(line || "").match(/^\/([a-zA-Z0-9_]+)(?:@[a-zA-Z0-9_]+)?(?:\s+(.*))?$/);
   if (!match) return null;
   return {
     command: match[1].toLowerCase(),

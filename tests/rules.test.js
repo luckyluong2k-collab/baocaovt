@@ -4,6 +4,7 @@ const { evaluateOrder, isDelivered, isReturningOrHighRisk, shouldSendAlert } = r
 const { normalizeOrder } = require("../src/order/normalize");
 const { buildUndeliveredReportMessages } = require("../src/reports/undeliveredReport");
 const { buildRevenueReportMessages, isInDelivery, isWaitingRedelivery, reportRowsForCode } = require("../src/reports/operationsReport");
+const { parseCommand } = require("../src/telegram/commands");
 const { sanitize, redactString } = require("../src/utils/sanitize");
 const { diffWholeDays } = require("../src/utils/time");
 
@@ -311,4 +312,9 @@ test("bao cao doanh thu luy tien hien tong tien va so don", () => {
   assert.match(messages[0], /\/BC5/);
   assert.match(messages[0], /1.500.000/);
   assert.match(messages[0], /Số đơn đã ghi:<\/b> 2/);
+});
+
+test("doc lenh telegram trong tin nhan nhieu dong", () => {
+  assert.deepEqual(parseCommand("/bc1\n/bc2\n/bc3"), { command: "bc1", args: "" });
+  assert.deepEqual(parseCommand("/BC2@baodonvtbot"), { command: "bc2", args: "" });
 });

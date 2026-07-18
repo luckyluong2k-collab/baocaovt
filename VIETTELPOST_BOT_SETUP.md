@@ -284,7 +284,7 @@ POST /api/telegram/webhook
 
 Neu dat `TELEGRAM_WEBHOOK_SECRET`, khi goi Telegram `setWebhook` can dung cung secret token de Telegram gui header `x-telegram-bot-api-secret-token`.
 
-GitHub Actions mien phi khong nhan lenh Telegram truc tiep; no chi gui bao cao theo lich.
+GitHub Actions mien phi co the doc lenh theo lich bang workflow `Telegram - Doc lenh bao cao`, moi 5 phut mot lan. Neu can tra loi gan nhu tuc thi thi dung server/webhook online.
 
 `/bc5` luu doanh thu theo ma van don da giao co COD vao `viettelpost_revenue_ledger`. Neu app Viettel Post xoa bot lich su cu sau vai thang, cac ma da tung duoc bot ghi van con trong so luy tien nay.
 
